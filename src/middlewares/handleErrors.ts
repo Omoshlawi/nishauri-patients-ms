@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import { APIException } from "../shared/exceprions";
 import { entries } from "lodash";
 
 export function handleErrors(
@@ -9,7 +8,7 @@ export function handleErrors(
   next: NextFunction
 ) {
   if (error.status) {
-    res.status(error.status).json({
+    return res.status(error.status).json({
       errors: entries(error.errors).reduce((prev, [key, value]) => {
         if (key === "_errors") return { ...prev, [key]: value };
         return {
@@ -22,7 +21,7 @@ export function handleErrors(
   // For other types of errors, return a generic error response
   console.log("[*]Error handler middleware: ", error.message);
 
-  res.status(500).json({ detail: "Internal Server Error" });
+  return res.status(500).json({ detail: "Internal Server Error" });
 }
 
 export default handleErrors;
