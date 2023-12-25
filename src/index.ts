@@ -32,7 +32,7 @@ app.use(express.static(MEDIA_ROOT));
 
 // routes
 app.get("/", (req, res) => {
-  res.send({ data: "Hello, world!" });
+  res.send({ data: "Hello, world!", headers: req.headers, query:req.query });
 });
 
 // error handler
