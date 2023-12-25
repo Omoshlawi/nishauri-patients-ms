@@ -34,12 +34,15 @@ const updateProgram = async (
   data: z.infer<typeof ProgramSchema>,
   programId: string | Types.ObjectId
 ) => {
+  if (!Types.ObjectId.isValid(programId))
+    throw { status: 404, errors: "Program not found" };
   /**
    * Ensure no other program with same name
    * Ensure no other program with same code
    * create program
    * return program
    */
+
   const errors: any = {};
   const { name, programCode } = data;
   let _program = await Program.findOne({ name });
@@ -58,8 +61,10 @@ const updateProgram = async (
 };
 
 const deleteProgram = async (programId: string | Types.ObjectId) => {
+  const errors = { status: 404, errors: "Program not found" };
+  if (!Types.ObjectId.isValid(programId)) throw errors;
   const program = await Program.findById(programId);
-  if (!program) throw { status: 404, errors: "Program not found" };
+  if (!program) throw errors;
   await program.deleteOne();
   return program;
 };
