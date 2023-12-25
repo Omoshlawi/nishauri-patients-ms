@@ -15,3 +15,4 @@ const Patient = model(
     },
   })
 );
+export default Patient

@@ -7,6 +7,7 @@ import morgan from "morgan";
 import cors from "cors";
 import { MEDIA_ROOT } from "./utils";
 import { handleErrors } from "./middlewares";
+import { default as programRoutes } from "./features/programs/route";
 
 const app = express();
 
@@ -32,8 +33,9 @@ app.use(express.static(MEDIA_ROOT));
 
 // routes
 app.get("/", (req, res) => {
-  res.send({ data: "Hello, world!", headers: req.headers, query:req.query });
+  res.send({ data: "Hello, world!", headers: req.headers, query: req.query });
 });
+app.use("/programs", programRoutes);
 
 // error handler
 app.use(handleErrors);
