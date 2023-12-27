@@ -2,6 +2,7 @@
     "name": "Nishauri Patiets",
     "db": "",
     "jwt": "",
+    "port": null,
     "nishauri": "https://ushauriapi.kenyahmis.org/nishauri/",
     "ushauri": "https://ushauriapi.kenyahmis.org/",
     "mapquest":"https://www.mapquestapi.com/",
