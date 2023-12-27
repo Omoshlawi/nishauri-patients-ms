@@ -55,6 +55,7 @@ httpServer.on("listening", () => {
   const bind =
     typeof address === "string" ? `pipe ${address}` : `port ${address?.port}`;
   const { register, unregister } = registry(
+    configuration.registry.url,
     configuration.name,
     configuration.version,
     toNumber(configuration.port)

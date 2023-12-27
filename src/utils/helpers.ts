@@ -108,6 +108,7 @@ export const sendSms = async (message: string, phone: string) => {
 };
 
 export const registry = (
+  registryBaseUrl:string,
   serviceName: string,
   serviceVersion: string,
   servicePort: number
@@ -115,7 +116,7 @@ export const registry = (
   register: async () => {
     try {
       await axios.put(
-        `http://localhost:9000/register/${serviceName}/${serviceVersion}/${servicePort}`
+        `${registryBaseUrl}/register/${serviceName}/${serviceVersion}/${servicePort}`
       );
     } catch (error) {
       console.error(error);
@@ -124,9 +125,8 @@ export const registry = (
   unregister: async () => {
     try {
       const response = await axios.delete(
-        `http://localhost:9000/register/${serviceName}/${serviceVersion}/${servicePort}`
+        `${registryBaseUrl}/register/${serviceName}/${serviceVersion}/${servicePort}`
       );
-      console.log(response.data);
     } catch (error) {
       console.error(error);
     }

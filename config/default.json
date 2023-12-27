@@ -13,6 +13,10 @@
         "ORDER_SUCCESS": "Dear {{name}}, we are delighted to inform you that your request has been received succesfully and is being processed, we will schedule the delivery accordingly.",
         "DELIVERY_SUCCESS": "Dear {{name}}, We are pleased to inform you that your recent delivery request has been successfully completed. Your order has been delivered as requested.Thank you for choosing our delivery service. We look forward to serving you again in the future.",
         "OTP_SMS": "Dear Nishauri User, enter this One Time PIN:: {{code}} to verify your nishauri account. Valid for the next 5 minutes.`"
+    },
+    "registry": {
+        "url":"http://localhost:9000",
+        "version": "*"
     }
 
 }

@@ -10,7 +10,8 @@ export const configuration = {
   nameAliase: config.get("name"),
   db: config.get("db") as string,
   port: config.get("port"),
+  registry: {
+    url: config.get("registry.url") as string,
+    version: config.get("registry.version") as string,
+  },
 };
-
-
-
