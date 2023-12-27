@@ -11,7 +11,7 @@
   "author": "Laurent Ouma",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.6.2",
+    "axios": "^1.6.3",
     "bcrypt": "^5.1.1",
     "config": "^3.3.9",
     "cors": "^2.8.5",

@@ -107,6 +107,31 @@ export const sendSms = async (message: string, phone: string) => {
   }
 };
 
+export const registry = (
+  serviceName: string,
+  serviceVersion: string,
+  servicePort: number
+) => ({
+  register: async () => {
+    try {
+      await axios.put(
+        `http://localhost:9000/register/${serviceName}/${serviceVersion}/${servicePort}`
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  unregister: async () => {
+    try {
+      const response = await axios.delete(
+        `http://localhost:9000/register/${serviceName}/${serviceVersion}/${servicePort}`
+      );
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  },
+});
 
 export function isValidURL(url: string): boolean {
   try {
