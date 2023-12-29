@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { programsRepository } from "../../data/respositories";
 import { ProgramSchema } from "../../presentation";
-import { APIException } from "../../../../shared/exceprions";
+import { APIException } from "../../../../shared/exceptions";
 
 export const getPrograms = async (
   req: Request,

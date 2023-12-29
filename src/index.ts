@@ -1,14 +1,12 @@
 import "dotenv/config";
 import { createServer } from "http";
 import express from "express";
-import proxy from "express-http-proxy";
 import mongoose from "mongoose";
 import morgan from "morgan";
 import cors from "cors";
 import { MEDIA_ROOT, configuration } from "./utils";
 import { handleErrors } from "./middlewares";
 import { default as programRoutes } from "./features/programs/route";
-import axios from "axios";
 import { registry } from "./utils/helpers";
 import { toNumber } from "lodash";
 
@@ -51,14 +49,14 @@ app.use(handleErrors);
 const port = configuration.port ?? 0; // Use environment variable if available, otherwise use 0 for random port
 
 httpServer.on("listening", () => {
-  const address = httpServer.address();
+  const address: any = httpServer.address();
   const bind =
     typeof address === "string" ? `pipe ${address}` : `port ${address?.port}`;
   const { register, unregister } = registry(
     configuration.registry.url,
     configuration.name,
     configuration.version,
-    toNumber(configuration.port)
+    toNumber(address.port)
   );
   register();
   const interval = setInterval(register, 10000);
@@ -72,13 +70,6 @@ httpServer.on("listening", () => {
   process.on("uncaughtException", cleanupAndExit);
   process.on("SIGTERM", cleanupAndExit);
   process.on("SIGINT", cleanupAndExit);
-
-  httpServer.on("listening", () => {
-    // ... rest of your code
-    console.info(
-      `[+]${configuration.name}:${configuration.version} listening on ${bind}`
-    );
-  });
 
   console.info(
     `[+]${configuration.name}:${configuration.version} listening on ${bind}`
