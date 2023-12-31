@@ -5,13 +5,6 @@ import moment from "moment/moment";
 import config from "config";
 import axios from "axios";
 
-export const formartError = (errors: any) => {
-  return {
-    status: 0,
-    errors: {},
-  };
-};
-
 export function generateOTP(length = 5) {
   var string = "0123456789";
   let OTP = "";

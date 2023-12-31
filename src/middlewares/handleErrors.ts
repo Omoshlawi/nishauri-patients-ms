@@ -7,6 +7,10 @@ export function handleErrors(
   res: Response,
   next: NextFunction
 ) {
+  /**
+   * {status: number, errors: {fields:{errors}}}
+   * {status:number, errors:{detail:string}}
+   */
   if (error.status) {
     return res.status(error.status).json(
       error.status === 400
@@ -19,7 +23,7 @@ export function handleErrors(
               };
             }, {}),
           }
-        : { detail: error.errors }
+        : error.errors
     );
   }
   // For other types of errors, return a generic error response

@@ -1,2 +1,2 @@
 export { default as programsRepository } from "./programs";
-export { default as userPrograRepository } from "./patientPrograms";
+export { default as patientProgramRepository } from "./patientPrograms";

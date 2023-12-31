@@ -28,7 +28,7 @@ mongoose
 
 // middlewares
 if (app.get("env") === "development") {
-  app.use(morgan("combined"));
+  app.use(morgan("tiny"));
   console.info(
     `[+]${configuration.name}:${configuration.version} enable morgan`
   );

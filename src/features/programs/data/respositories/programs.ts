@@ -35,7 +35,7 @@ const updateProgram = async (
   programId: string | Types.ObjectId
 ) => {
   if (!Types.ObjectId.isValid(programId))
-    throw { status: 404, errors: "Program not found" };
+    throw { status: 404, errors: { detail: "Program not found" } };
   /**
    * Ensure no other program with same name
    * Ensure no other program with same code
@@ -61,7 +61,7 @@ const updateProgram = async (
 };
 
 const deleteProgram = async (programId: string | Types.ObjectId) => {
-  const errors = { status: 404, errors: "Program not found" };
+  const errors = { status: 404, errors: { detail: "Program not found" } };
   if (!Types.ObjectId.isValid(programId)) throw errors;
   const program = await Program.findById(programId);
   if (!program) throw errors;

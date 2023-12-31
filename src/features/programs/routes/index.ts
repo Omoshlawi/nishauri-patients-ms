@@ -4,9 +4,15 @@ import {
   createProgram,
   deleteProgram,
   updateProgram,
+  getRegisteredPrograms,
+  register,
+  verifyProgramRegistration,
 } from "../domain";
 
 const router = Router();
+
+router.get("/patient-programs/:id", getRegisteredPrograms);
+router.post("/patient-programs/:id", register);
 
 router.get("/", getPrograms);
 router.post("/", createProgram);
