@@ -4,7 +4,7 @@ import {
   createProgram,
   deleteProgram,
   updateProgram,
-} from "./domain";
+} from "../domain";
 
 const router = Router();
 

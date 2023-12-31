@@ -1,2 +1,2 @@
-export { default as PatientProgramSchema } from "./PatientProgramSchema";
+export { default as PatientProgramRegistrationSchema } from "./PatientProgramRegistrationSchema";
 export { default as ProgramSchema } from "./ProgramSchema";

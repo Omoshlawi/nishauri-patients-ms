@@ -6,7 +6,7 @@ import morgan from "morgan";
 import cors from "cors";
 import { MEDIA_ROOT, configuration } from "./utils";
 import { handleErrors } from "./middlewares";
-import { default as programRoutes } from "./features/programs/route";
+import { default as programRoutes } from "./features/programs/routes";
 import { registry } from "./utils/helpers";
 import { toNumber } from "lodash";
 

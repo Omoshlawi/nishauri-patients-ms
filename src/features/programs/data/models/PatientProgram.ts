@@ -4,12 +4,10 @@ const PatientProgram = model(
   "UserProgram",
   new Schema(
     {
-      program: {
-        type: Types.ObjectId,
-        ref: "Program",
+      programCode: {
+        type: String,
         required: true,
       },
-      description: String,
       isActive: {
         type: Boolean,
         default: true,
