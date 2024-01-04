@@ -6,13 +6,16 @@ import {
 } from "../../data/respositories";
 import { Types } from "mongoose";
 import { APIException } from "../../../../shared/exceptions";
-import { PatientProgramRegistrationSchema } from "../../presentation";
+import {
+  PatientProgramRegistrationSchema,
+  ProgramVerificationSchema,
+} from "../../presentation";
 import config from "config";
-import { parseMessage } from "../../../../utils/helpers";
+import { parseMessage, sendSms } from "../../../../utils/helpers";
 import { patientsRepository } from "../../../patients/data/respositories";
 
 export const requestVerificationCode = async (
-  req: UserRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
@@ -23,10 +26,15 @@ export const requestVerificationCode = async (
     )
       ? (req.query.mode as any)
       : "sms";
+    if (!Types.ObjectId.isValid(req.params.id))
+      throw { status: 404, errors: { detail: "Patient not found" } };
+    const patient = await patientsRepository.getPatientByUserId(req.params.id);
 
+    if (!patient)
+      throw { status: 404, errors: { detail: "Patient not found" } };
     const { otp: code } =
-      await patientProgramRepository.getOrCreateAccountVerification(
-        req.user._id,
+      await patientProgramRepository.getOrCreateProgramVerification(
+        patient._id,
         mode
       );
 
@@ -34,9 +42,9 @@ export const requestVerificationCode = async (
     const smsTemplate: string = config.get("sms.PROGRAM_OTP_SMS");
     const sms = parseMessage({ code }, smsTemplate);
 
-    // await sendSms(sms, "0793889658");
+    await sendSms(sms, "0793889658");
     return res.json({
-      detail: `OTP sent to ${mode} successfully`,
+      detail: `OTP sent to ${mode} 0793889658 successfully`,
     });
   } catch (error) {
     next(error);
@@ -52,7 +60,7 @@ export const register = async (
     //----------------1.Validation
     //  a.validate param id
     if (!Types.ObjectId.isValid(req.params.id))
-      throw { status: 404, errors: { detail: "Invalid patient" } };
+      throw { status: 404, errors: { detail: "Patient not found" } };
     const validation = await PatientProgramRegistrationSchema.safeParseAsync(
       req.body
     );
@@ -140,11 +148,31 @@ export const getRegisteredPrograms = async (
   }
 };
 export const verifyProgramRegistration = async (
-  req: UserRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
+    if (!Types.ObjectId.isValid(req.params.id))
+      throw { status: 404, errors: { detail: "Invalid patient" } };
+    const verification = await ProgramVerificationSchema.safeParseAsync(
+      req.body
+    );
+    if (!verification.success)
+      throw new APIException(400, verification.error.format());
+
+    const patient = await patientsRepository.getPatientByUserId(req.params.id);
+
+    if (!patient)
+      throw { status: 404, errors: { detail: "Patient not found" } };
+
+    await patientProgramRepository.verifyProgramRegistration(
+      patient._id,
+      verification.data
+    );
+    return res.json({
+      detail: "Verification successfull!",
+    });
   } catch (error) {
     next(error);
   }

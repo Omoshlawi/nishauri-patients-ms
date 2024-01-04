@@ -118,6 +118,10 @@ const updatePatient = async (patient: any) => {
   );
 };
 
+const getPatientByUserId = async (userId: string) => {
+  return await Patient.findOne({ "person.user._id": userId });
+};
+
 export default {
   getPatientById,
   searchEMRPatient,
@@ -128,4 +132,5 @@ export default {
   },
   savePatient,
   updatePatient,
+  getPatientByUserId,
 };

@@ -7,12 +7,15 @@ import {
   getRegisteredPrograms,
   register,
   verifyProgramRegistration,
+  requestVerificationCode,
 } from "../domain";
 
 const router = Router();
 
 router.get("/patient-programs/:id", getRegisteredPrograms);
 router.post("/patient-programs/:id", register);
+router.get("/patient-programs/:id/verify", requestVerificationCode);
+router.post("/patient-programs/:id/verify", verifyProgramRegistration);
 
 router.get("/", getPrograms);
 router.post("/", createProgram);

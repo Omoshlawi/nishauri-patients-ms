@@ -6,7 +6,7 @@ const ProgramVerification = model(
   "ProgramVerification",
   new Schema(
     {
-      user: {
+      patient: {
         type: Schema.Types.ObjectId,
         ref: "Patient",
         required: true,

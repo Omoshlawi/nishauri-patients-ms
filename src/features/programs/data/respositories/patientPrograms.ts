@@ -1,9 +1,13 @@
 import { z } from "zod";
 import { PatientProgram, ProgramVerification } from "../models";
-import { PatientProgramRegistrationSchema } from "../../presentation";
+import {
+  PatientProgramRegistrationSchema,
+  ProgramVerificationSchema,
+} from "../../presentation";
 import { Patient } from "../../../patients/data/models";
 import { Types } from "mongoose";
 import { patientsRepository } from "../../../patients/data/respositories";
+import moment from "moment/moment";
 
 const _getProgramUniqueFieldName = (programCode: "HIV" | "TB") => {
   const MAPPING: { [key: string]: string } = {
@@ -28,7 +32,7 @@ const userRegisteredToProgram = async (userId: string, programCode: string) => {
 };
 
 const getPatientPrograms = async (patientId: any) => {
-  return await PatientProgram.find({ patient: patientId });
+  return await PatientProgram.find({ patient: patientId, isActive: true });
 };
 
 const getEMRPatient = async ({
@@ -75,15 +79,43 @@ const registerForProgram = async (
   //TODO Replace phone number with emr contact from to send otp
   // await sendSms(sms, "0793889658");
 };
-const verifyProgramRegistration = async (patientId: any) => {};
+const verifyProgramRegistration = async (
+  patientId: any,
+  data: z.infer<typeof ProgramVerificationSchema>
+) => {
+  const verification = await ProgramVerification.findOne({
+    patient: patientId,
+    verified: false,
+    expiry: {
+      $gte: moment(),
+    },
+    otp: data.otp,
+  });
+  if (!verification)
+    throw {
+      errors: { otp: { _errors: ["Invalid or Expired code!"] } },
+      status: 400,
+    };
+  const patientProgram = await PatientProgram.findOne({
+    patient: patientId,
+    programCode: data.programCode,
+  });
+  if (!patientProgram)
+    throw {
+      status: 400,
+      errors: { programCode: { _errors: ["Invalid program code"] } },
+    };
+  patientProgram.isActive = true;
+  await patientProgram.save();
+};
 
-const getOrCreateAccountVerification = async (
-  userId: string | Types.ObjectId,
+const getOrCreateProgramVerification = async (
+  patientId: string | Types.ObjectId,
   mode: "sms" | "watsapp" | "email"
 ) => {
   // Generate OTP
   const verification = await ProgramVerification.getOrCreate({
-    patient: userId,
+    patient: patientId,
     extra: mode,
   });
   return verification;
@@ -109,6 +141,6 @@ export default {
   verifyProgramRegistration,
   userRegisteredToProgram,
   getEMRPatient,
-  getOrCreateAccountVerification,
+  getOrCreateProgramVerification,
   createPatientProgram,
 };
