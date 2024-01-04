@@ -107,6 +107,9 @@ const verifyProgramRegistration = async (
     };
   patientProgram.isActive = true;
   await patientProgram.save();
+
+  verification.verified = true;
+  verification.save();
 };
 
 const getOrCreateProgramVerification = async (

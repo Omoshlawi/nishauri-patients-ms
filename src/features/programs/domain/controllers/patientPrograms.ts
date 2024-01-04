@@ -140,9 +140,13 @@ export const getRegisteredPrograms = async (
   try {
     if (!Types.ObjectId.isValid(req.params.id))
       throw { status: 404, errors: { detail: "Invalid patient" } };
-    return res.json(
-      await patientProgramRepository.getPatientPrograms(req.params.id)
-    );
+    const patient = await patientsRepository.getPatientByUserId(req.params.id);
+
+    if (!patient)
+      throw { status: 404, errors: { detail: "Patient not found" } };
+    return res.json({
+      reuslts: await patientProgramRepository.getPatientPrograms(patient._id),
+    });
   } catch (error) {
     next(error);
   }
