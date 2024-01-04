@@ -48,7 +48,7 @@ async function callService(
 
     throw {
       status: 500,
-      errors: error.message,
+      errors: { detail: error.message },
     };
   }
 }

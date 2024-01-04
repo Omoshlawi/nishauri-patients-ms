@@ -1,0 +1,1 @@
+export {default as patientsRepository} from "./PatientRepository"

@@ -19,12 +19,10 @@ const Person = model(
     email: {
       type: String,
       required: true,
-      unique: true,
     },
     phoneNumber: {
       type: String,
       required: true,
-      unique: true,
     },
     dateOfBirth: {
       type: Date,
