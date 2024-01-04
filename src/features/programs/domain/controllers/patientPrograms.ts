@@ -63,7 +63,7 @@ export const register = async (
     if (
       await patientProgramRepository.userRegisteredToProgram(
         req.params.id,
-        validation.data.mflCode
+        validation.data.programCode
       )
     )
       throw new APIException(400, {
@@ -79,6 +79,7 @@ export const register = async (
     // b.Extract patient identifiers
     const identifiers =
       patientsRepository.patientEMRDataExtractor.extractIndentifiers(
+        validation.data.mflCode,
         patient.identifiers
       );
     // c.Get profile from users ms
@@ -91,9 +92,14 @@ export const register = async (
       identifiers,
       person: { ...profile.person[0], user: profile },
     };
+
     // e.Persist patient to db id not exist otherwise update in background
-    patientsRepository.savePatient(_patient);
-    
+    _patient = await patientsRepository.savePatient(_patient, "update");
+    // -------------3. Create User program with active false if not exists
+    await patientProgramRepository.createPatientProgram(
+      _patient._id,
+      validation.data.programCode
+    );
 
     // Extract contacts from patient attributes
     const contacts = patientsRepository.patientEMRDataExtractor.extractContacts(
@@ -101,7 +107,7 @@ export const register = async (
     );
     //
 
-    return res.json(_patient);
+    return res.json(contacts);
   } catch (error) {
     next(error);
   }

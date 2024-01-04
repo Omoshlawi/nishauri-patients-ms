@@ -16,7 +16,13 @@ const _getProgramUniqueFieldName = (programCode: "HIV" | "TB") => {
 const userRegisteredToProgram = async (userId: string, programCode: string) => {
   const patient = await Patient.findOne({ "person.user._id": userId });
   if (!patient) return false;
-  if (!(await PatientProgram.findOne({ patient: patient._id, programCode })))
+  if (
+    !(await PatientProgram.findOne({
+      patient: patient._id,
+      programCode,
+      isActive: true,
+    }))
+  )
     return false;
   return true;
 };
@@ -83,6 +89,20 @@ const getOrCreateAccountVerification = async (
   return verification;
 };
 
+const createPatientProgram = async (
+  patientId: Types.ObjectId,
+  programCode: string
+) => {
+  let program = await PatientProgram.findOne({
+    patient: patientId,
+    programCode,
+  });
+  if (program) return program;
+  program = new PatientProgram({ patient: patientId, programCode });
+  await program.save();
+  return program;
+};
+
 export default {
   getPatientPrograms,
   registerForProgram,
@@ -90,4 +110,5 @@ export default {
   userRegisteredToProgram,
   getEMRPatient,
   getOrCreateAccountVerification,
+  createPatientProgram,
 };

@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import ServiceClient from "../../../../shared/ServiceClient";
 import { Patient } from "../models";
-import { omit } from "lodash";
+import { merge, omit, pick } from "lodash";
 
 const getPatientById = async (patientId: string | Types.ObjectId) => {};
 
@@ -24,10 +24,11 @@ const getPatientProfileByUserId = async (userId: string, token: string) => {
     headers: { "x-access-token": token },
   });
 };
-const extractIndentifiers = (identifiers: any[]) =>
+const extractIndentifiers = (mflCode: string, identifiers: any[]) =>
   identifiers.map((identifier) => ({
     identifier: identifier.identifier,
     identifierType: identifier.identifierType.display,
+    mflCode,
   }));
 
 const extractContacts = (
@@ -49,20 +50,72 @@ const extractContacts = (
   }, {});
 };
 
-const savePatient = async (patient: any) => {
-  if (patient._id) {
-    // Update and return
-    const _patient = await Patient.findByIdAndUpdate(
-      patient._id,
-      omit(patient, ["_id"]),
-      { new: true }
-    );
+const savePatient = async (
+  patient: any,
+  mode: "update" | "override"
+): Promise<any> => {
+  let _patient;
+
+  try {
+    if (await Patient.findOne({ "person._id": patient.person._id })) {
+      if (mode === "update") {
+        _patient = await updatePatient(patient);
+      } else {
+        _patient = await Patient.findByIdAndUpdate(
+          patient._id,
+          omit(patient, ["_id"]),
+          { new: true }
+        );
+      }
+    } else {
+      _patient = new Patient(patient);
+      await _patient.save();
+    }
+
     return _patient;
+  } catch (error) {
+    // Handle and log the error
+    console.error("Error in savePatient:", error);
+    throw error;
   }
-  // create and return
-  const _patient = new Patient(patient);
-  await _patient.save();
-  return _patient;
+};
+
+const updatePatient = async (patient: any) => {
+  const pat = await Patient.findOne({ "person._id": patient.person._id });
+  const currIds = pat?.identifiers ?? [];
+  const newIds: {
+    identifier: string;
+    identifierType: string;
+    mflCode: string;
+  }[] = patient?.identifiers ?? [];
+
+  // Update existing identifiers and add new ones
+  const updatedIdentifiers = newIds.map((newId) => {
+    const existingId = currIds.find(
+      (currId) =>
+        currId.mflCode === newId.mflCode &&
+        currId.identifierType === newId.identifierType
+    );
+
+    if (existingId) {
+      // If the identifier exists, update its fields
+      return {
+        ...pick(existingId, ["_id", "identifier", "identifierType", "mflCode"]),
+        ...newId,
+      };
+    } else {
+      // If the identifier doesn't exist, add it to the list
+      return newId;
+    }
+  });
+  // Merge the patient object with the updated identifiers
+  return await Patient.findOneAndUpdate(
+    { "person._id": patient.person._id },
+    merge(omit(patient, ["_id", "identifiers"]), {
+      identifiers: updatedIdentifiers,
+    }),
+    { new: true }
+  );
 };
 
 export default {
@@ -74,4 +127,5 @@ export default {
     extractIndentifiers,
   },
   savePatient,
+  updatePatient,
 };

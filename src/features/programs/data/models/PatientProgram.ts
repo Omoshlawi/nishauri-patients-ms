@@ -10,7 +10,7 @@ const PatientProgram = model(
       },
       isActive: {
         type: Boolean,
-        default: true,
+        default: false,
       },
       patient: {
         type: Types.ObjectId,

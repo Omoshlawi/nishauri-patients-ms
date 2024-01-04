@@ -12,6 +12,10 @@ const PatientIdentifier = model(
       type: String,
       required: true,
     },
+    mflCode: {
+      type: String,
+      required: true,
+    },
   })
 );
 
