@@ -87,27 +87,39 @@ export const register = async (
       req.params.id,
       req.header("x-access-token") as string
     );
-    // d.Create local paient object
+
+    // d.Extract contacts from patient attributes
+    const contacts = patientsRepository.patientEMRDataExtractor.extractContacts(
+      patient.person.attributes
+    );
+    // e.Create local paient object
     let _patient: any = {
       identifiers,
       person: { ...profile.person[0], user: profile },
+      contact: Object.entries(contacts).map(([type, contact]) => ({
+        type,
+        contact,
+      })),
     };
 
-    // e.Persist patient to db id not exist otherwise update in background
+    // f.Persist patient to db id not exist otherwise update in background
     _patient = await patientsRepository.savePatient(_patient, "update");
+
     // -------------3. Create User program with active false if not exists
+
+    // b. Create program
     await patientProgramRepository.createPatientProgram(
       _patient._id,
       validation.data.programCode
     );
-
-    // Extract contacts from patient attributes
-    const contacts = patientsRepository.patientEMRDataExtractor.extractContacts(
-      patient.person.attributes
-    );
+    // 4.
     //
 
-    return res.json(contacts);
+    return res.json({
+      message: "Choose where otp is sent",
+      requestOTPUrl: "",
+      contacts: _patient.contact,
+    });
   } catch (error) {
     next(error);
   }
