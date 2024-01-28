@@ -8,7 +8,7 @@ import {
   register,
   verifyProgramRegistration,
   requestVerificationCode,
-} from "../domain";
+} from "../controllers";
 
 const router = Router();
 

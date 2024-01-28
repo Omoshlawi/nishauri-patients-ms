@@ -14,7 +14,7 @@ const PatientSchema = new Schema({
     type: [PatientIdentifierSchema],
     default: [],
   },
-  contact: {
+  contacts: {
     type: [ContactSchema],
     default: [],
   },
