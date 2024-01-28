@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import ServiceClient from "../../../../shared/ServiceClient";
+import ServiceClient from "../../../shared/ServiceClient";
 import { Patient } from "../models";
 import { merge, omit, pick } from "lodash";
 

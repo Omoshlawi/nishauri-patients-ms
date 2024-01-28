@@ -4,9 +4,9 @@ import {
   PatientProgramRegistrationSchema,
   ProgramVerificationSchema,
 } from "../schemas";
-import { Patient } from "../../patients/data/models";
+import { Patient } from "../../patients/models";
 import { Types } from "mongoose";
-import { patientsRepository } from "../../patients/data/respositories";
+import { patientsRepository } from "../../patients/repositories";
 import moment from "moment/moment";
 
 const _getProgramUniqueFieldName = (programCode: "HIV" | "TB") => {

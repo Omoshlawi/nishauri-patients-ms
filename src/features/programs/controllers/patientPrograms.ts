@@ -8,7 +8,7 @@ import {
 } from "../schemas";
 import config from "config";
 import { parseMessage, sendSms } from "../../../utils/helpers";
-import { patientsRepository } from "../../patients/data/respositories";
+import { patientsRepository } from "../../patients/repositories";
 import { APIException } from "../../../shared/exceprions";
 
 export const requestVerificationCode = async (
