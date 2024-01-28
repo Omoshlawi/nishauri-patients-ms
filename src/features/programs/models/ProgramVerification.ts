@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import { generateExpiryTime, generateOTP } from "../../../../utils/helpers";
+import { generateExpiryTime, generateOTP } from "../../../utils/helpers";
 import moment from "moment/moment";
 
 const ProgramVerification = model(

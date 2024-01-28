@@ -4,10 +4,15 @@ import morgan from "morgan";
 import { MEDIA_ROOT, configuration } from "../utils";
 import { handleErrors } from "../middlewares";
 import logger from "../shared/logger";
+import mongoose from "mongoose";
+import { default as programRoutes } from "../features/programs/routes";
 
 export const dbConnection = async () => {
   try {
-    // Connect to database here
+    await mongoose.connect(configuration.db as string);
+    logger.info(
+      `[+]${configuration.name}:${configuration.version} Connected to database Successfully`
+    );
   } catch (error) {
     logger.error("[x]Could not connect to database" + error);
     process.exit(1); // Exit the application on database connection error
@@ -29,7 +34,8 @@ export const configureExpressApp = async (app: Application) => {
   // ------------------End middlewares------------------------
 
   //------------------- routes --------------------------------
-  // Add routes here
+  app.use("/programs", programRoutes);
+
   //-------------------end routes-----------------------------
 
   //---------------- error handler -----------------------

@@ -3,10 +3,10 @@ import { PatientProgram, ProgramVerification } from "../models";
 import {
   PatientProgramRegistrationSchema,
   ProgramVerificationSchema,
-} from "../../presentation";
-import { Patient } from "../../../patients/data/models";
+} from "../schemas";
+import { Patient } from "../../patients/data/models";
 import { Types } from "mongoose";
-import { patientsRepository } from "../../../patients/data/respositories";
+import { patientsRepository } from "../../patients/data/respositories";
 import moment from "moment/moment";
 
 const _getProgramUniqueFieldName = (programCode: "HIV" | "TB") => {

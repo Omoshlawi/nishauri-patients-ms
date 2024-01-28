@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { Program } from "../models";
-import { ProgramSchema } from "../../presentation";
+import { ProgramSchema } from "../schemas";
 import { isEmpty } from "lodash";
 import { Types } from "mongoose";
 

@@ -1,18 +1,15 @@
 import { NextFunction, Request, Response } from "express";
-import { UserRequest } from "../../../../shared/types";
-import {
-  patientProgramRepository,
-  programsRepository,
-} from "../../data/respositories";
+import { UserRequest } from "../../../shared/types";
+import { patientProgramRepository, programsRepository } from "../repositories";
 import { Types } from "mongoose";
-import { APIException } from "../../../../shared/exceptions";
 import {
   PatientProgramRegistrationSchema,
   ProgramVerificationSchema,
-} from "../../presentation";
+} from "../schemas";
 import config from "config";
-import { parseMessage, sendSms } from "../../../../utils/helpers";
-import { patientsRepository } from "../../../patients/data/respositories";
+import { parseMessage, sendSms } from "../../../utils/helpers";
+import { patientsRepository } from "../../patients/data/respositories";
+import { APIException } from "../../../shared/exceprions";
 
 export const requestVerificationCode = async (
   req: Request,
