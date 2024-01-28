@@ -4,7 +4,7 @@ import {
   PatientProgramRegistrationSchema,
   ProgramVerificationSchema,
 } from "../schemas";
-import { Patient } from "../../patients/models";
+import { PatientModel } from "../../patients/models";
 import { Types } from "mongoose";
 import { patientsRepository } from "../../patients/repositories";
 import moment from "moment/moment";
@@ -18,7 +18,7 @@ const _getProgramUniqueFieldName = (programCode: "HIV" | "TB") => {
 };
 
 const userRegisteredToProgram = async (userId: string, programCode: string) => {
-  const patient = await Patient.findOne({ "person.user._id": userId });
+  const patient = await PatientModel.findOne({ "person.user._id": userId });
   if (!patient) return false;
   if (
     !(await PatientProgram.findOne({

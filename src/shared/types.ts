@@ -25,6 +25,7 @@ export interface Repository<T extends Entity> {
   findByCriteria(criteria: Record<string, any>): Promise<T[]>;
   updateById(id: string, updates: Partial<T>): Promise<T | undefined>;
   deleteById(id: string): Promise<void>;
+  exists(criteria: Record<string, any>): Promise<boolean>;
 }
 
 export abstract class BaseEntity implements Entity {

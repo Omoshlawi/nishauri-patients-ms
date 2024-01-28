@@ -3,20 +3,84 @@ import ServiceClient from "../../../shared/ServiceClient";
 import { PatientModel } from "../models";
 import { merge, omit, pick } from "lodash";
 import { Repository } from "../../../shared/types";
-import { Patient } from "../entities";
+import { Patient, PatientIdentifier } from "../entities";
+import logger from "../../../shared/logger";
 
 class PatientsRepository implements Repository<Patient> {
-  create(entity: Patient): Promise<Patient> {
-    throw new Error("Method not implemented.");
+  async exists(criteria: Record<string, any>): Promise<boolean> {
+    const patient = await PatientModel.findOne(criteria);
+    return patient !== null;
   }
-  findOneById(id: string): Promise<Patient | undefined> {
-    throw new Error("Method not implemented.");
+  /**
+   * Ensure patient.person._id (Person unique)
+   * @param entity
+   * @throws Validation exception with 400 status code
+   * @returns Patient
+   */
+  async create(entity: Patient): Promise<Patient> {
+    if (await this.exists({ "person._id": entity.person._id })) {
+      throw {
+        status: 400,
+        errors: { person: { _errors: ["Patient already exist"] } },
+      };
+    }
+    const patient = new PatientModel(entity);
+    await patient.save();
+    return patient as any;
   }
-  findAll(): Promise<Patient[]> {
-    throw new Error("Method not implemented.");
+  async findOneById(id: string): Promise<Patient | undefined> {
+    const patient = await PatientModel.findById(id);
+    return patient as any;
+  }
+  async findAll(): Promise<Patient[]> {
+    return await PatientModel.find();
   }
   findByCriteria(criteria: Record<string, any>): Promise<Patient[]> {
     throw new Error("Method not implemented.");
+  }
+  async updatePatient(patient: any) {
+    const pat = await PatientModel.findOne({
+      "person._id": patient.person._id,
+    });
+    const currIds = pat?.identifiers ?? [];
+    const newIds: {
+      identifier: string;
+      identifierType: string;
+      mflCode: string;
+    }[] = patient?.identifiers ?? [];
+
+    // Update existing identifiers and add new ones
+    const updatedIdentifiers = newIds.map((newId) => {
+      const existingId = currIds.find(
+        (currId) =>
+          currId.mflCode === newId.mflCode &&
+          currId.identifierType === newId.identifierType
+      );
+
+      if (existingId) {
+        // If the identifier exists, update its fields
+        return {
+          ...pick(existingId, [
+            "_id",
+            "identifier",
+            "identifierType",
+            "mflCode",
+          ]),
+          ...newId,
+        };
+      } else {
+        // If the identifier doesn't exist, add it to the list
+        return newId;
+      }
+    });
+    // Merge the patient object with the updated identifiers
+    return await PatientModel.findOneAndUpdate(
+      { "person._id": patient.person._id },
+      merge(omit(patient, ["_id", "identifiers"]), {
+        identifiers: updatedIdentifiers,
+      }),
+      { new: true }
+    );
   }
   updateById(
     id: string,
@@ -28,8 +92,11 @@ class PatientsRepository implements Repository<Patient> {
     throw new Error("Method not implemented.");
   }
 
-  extractIndentifiers(mflCode: string, identifiers: any[]) {
-    identifiers.map((identifier) => ({
+  extractIndentifiers(
+    mflCode: string,
+    identifiers: any[]
+  ): PatientIdentifier[] {
+    return identifiers.map((identifier) => ({
       identifier: identifier.identifier,
       identifierType: identifier.identifierType.display,
       mflCode,
@@ -77,7 +144,7 @@ class PatientsRepository implements Repository<Patient> {
     let _patient;
 
     try {
-      if (await PatientModel.findOne({ "person._id": patient.person._id })) {
+      if (await this.exists({ "person._id": patient.person._id })) {
         if (mode === "update") {
           _patient = await this.updatePatient(patient);
         } else {
@@ -95,53 +162,9 @@ class PatientsRepository implements Repository<Patient> {
       return _patient;
     } catch (error) {
       // Handle and log the error
-      console.error("Error in savePatient:", error);
+      logger.error("Error in savePatient: " + error);
       throw error;
     }
-  }
-  async updatePatient(patient: any) {
-    const pat = await PatientModel.findOne({
-      "person._id": patient.person._id,
-    });
-    const currIds = pat?.identifiers ?? [];
-    const newIds: {
-      identifier: string;
-      identifierType: string;
-      mflCode: string;
-    }[] = patient?.identifiers ?? [];
-
-    // Update existing identifiers and add new ones
-    const updatedIdentifiers = newIds.map((newId) => {
-      const existingId = currIds.find(
-        (currId) =>
-          currId.mflCode === newId.mflCode &&
-          currId.identifierType === newId.identifierType
-      );
-
-      if (existingId) {
-        // If the identifier exists, update its fields
-        return {
-          ...pick(existingId, [
-            "_id",
-            "identifier",
-            "identifierType",
-            "mflCode",
-          ]),
-          ...newId,
-        };
-      } else {
-        // If the identifier doesn't exist, add it to the list
-        return newId;
-      }
-    });
-    // Merge the patient object with the updated identifiers
-    return await PatientModel.findOneAndUpdate(
-      { "person._id": patient.person._id },
-      merge(omit(patient, ["_id", "identifiers"]), {
-        identifiers: updatedIdentifiers,
-      }),
-      { new: true }
-    );
   }
 }
 

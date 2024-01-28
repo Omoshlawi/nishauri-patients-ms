@@ -82,11 +82,10 @@ export const register = async (
       validation.data
     );
     // b.Extract patient identifiers
-    const identifiers =
-      patientsRepository.patientEMRDataExtractor.extractIndentifiers(
-        validation.data.mflCode,
-        patient.identifiers
-      );
+    const identifiers = patientsRepository.extractIndentifiers(
+      validation.data.mflCode,
+      patient.identifiers
+    );
     // c.Get profile from users ms
     const profile = await patientsRepository.getPatientProfileByUserId(
       req.params.id,
@@ -94,7 +93,7 @@ export const register = async (
     );
 
     // d.Extract contacts from patient attributes
-    const contacts = patientsRepository.patientEMRDataExtractor.extractContacts(
+    const contacts = patientsRepository.extractContacts(
       patient.person.attributes
     );
     // e.Create local paient object
