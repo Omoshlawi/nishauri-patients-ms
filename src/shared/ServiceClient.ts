@@ -13,10 +13,20 @@ async function getService(serviceName: string) {
     if (axios.isAxiosError(error)) {
       const axiosError: AxiosError = error;
       if (axiosError.response?.status === 404) {
-        console.error(`[x]${(axiosError.response.data as any).detail}`);
+        throw {
+          status: 404,
+          errors: (axiosError.response.data as any).detail,
+        };
       }
+      throw {
+        status: axiosError.status,
+        errors: axiosError.message,
+      };
     }
-    throw error;
+    throw {
+      status: 500,
+      errors: error.message,
+    };
   }
 }
 
@@ -24,31 +34,28 @@ async function callService(
   serviceName: string,
   requestOptions: AxiosRequestConfig
 ) {
+  const { host, port } = await getService(serviceName);
+  requestOptions.url = `http://${host}:${port}/${requestOptions.url}`;
   try {
-    const { host, port } = await getService(serviceName);
-    requestOptions.url = `http://${host}:${port}/${requestOptions.url}`;
     const response: AxiosResponse<any> = await axios(requestOptions);
     return response.data;
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
       const axiosError: AxiosError = error;
-      if (
-        [400, 401, 403, 404, 500].includes(axiosError.response?.status ?? 0)
-      ) {
-        const errors =
-          (axiosError.response?.data as any)?.errors ??
-          (axiosError.response?.data as any);
-
+      if (axiosError.response?.status === 404) {
         throw {
-          status: axiosError.response?.status,
-          errors,
+          status: axiosError.status,
+          errors: (axiosError.response.data as any).detail,
         };
       }
+      throw {
+        status: axiosError.status,
+        errors: axiosError.message,
+      };
     }
-
     throw {
       status: 500,
-      errors: { detail: error.message },
+      errors: error.message,
     };
   }
 }

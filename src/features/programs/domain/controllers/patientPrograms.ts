@@ -124,8 +124,8 @@ export const register = async (
     //
 
     return res.json({
+      programCode: validation.data.programCode,
       message: "Choose where otp is sent",
-      requestOTPUrl: "",
       contacts: _patient.contact,
     });
   } catch (error) {

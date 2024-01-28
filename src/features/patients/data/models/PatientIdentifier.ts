@@ -4,7 +4,6 @@ const PatientIdentifierSchema = new Schema({
   identifier: {
     type: String,
     required: true,
-    unique: true,
   },
   identifierType: {
     type: String,
