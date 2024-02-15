@@ -55,16 +55,16 @@ export const register = async (
 ) => {
   try {
     //----------------1.Validation
-    //  a.validate param id
+    //  a.validate param id id is valid Object id(userId) ✅
     if (!Types.ObjectId.isValid(req.params.id))
       throw { status: 404, errors: { detail: "Patient not found" } };
     const validation = await PatientProgramRegistrationSchema.safeParseAsync(
       req.body
     );
-    // b.Validated body
+    // b.Validated body ✅
     if (!validation.success)
       throw new APIException(400, validation.error.format());
-    // Validate if user is registered to progam
+    // Validate if user is registered to progam ✅
     if (
       await patientProgramRepository.userRegisteredToProgram(
         req.params.id,
@@ -76,27 +76,27 @@ export const register = async (
           _errors: ["You are already registered to this program"],
         },
       });
-    // --------------2. Get EMR Patient and save
+    // --------------2. Get EMR Patient and save ✅
     // a.GET Patient from EMR, throws excepion if no match
     const patient = await patientProgramRepository.getEMRPatient(
       validation.data
     );
-    // b.Extract patient identifiers
+    // b.Extract patient identifiers ✅
     const identifiers = patientsRepository.extractIndentifiers(
       validation.data.mflCode,
       patient.identifiers
     );
-    // c.Get profile from users ms
+    // c.Get profile from users ms using user Id ✅
     const profile = await patientsRepository.getPatientProfileByUserId(
       req.params.id,
       req.header("x-access-token") as string
     );
 
-    // d.Extract contacts from patient attributes
+    // d.Extract contacts from patient attributes ✅
     const contacts = patientsRepository.extractContacts(
       patient.person.attributes
     );
-    // e.Create local paient object
+    // e.Create local paient object ✅
     let _patient: any = {
       identifiers,
       person: { ...profile.person[0], user: profile },
@@ -106,7 +106,7 @@ export const register = async (
       })),
     };
 
-    // f.Persist patient to db id not exist otherwise update in background
+    // f.Persist patient to db by creating new if don't already exist otherwise update
     _patient = await patientsRepository.savePatient(_patient, "update");
 
     // -------------3. Create User program with active false if not exists

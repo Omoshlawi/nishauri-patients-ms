@@ -38,6 +38,11 @@ class PatientsRepository implements Repository<Patient> {
   findByCriteria(criteria: Record<string, any>): Promise<Patient[]> {
     throw new Error("Method not implemented.");
   }
+  /**
+   * Updates the patient by adding Identifier and contacts to ther respective list if dont already exist otherwise updates the values
+   * @param patient
+   * @returns
+   */
   async updatePatient(patient: any) {
     const pat = await PatientModel.findOne({
       "person._id": patient.person._id,
@@ -102,6 +107,12 @@ class PatientsRepository implements Repository<Patient> {
       mflCode,
     }));
   }
+  /**
+   * Makes a call to registered facility using mfl code searching for patient
+   * @param mflCode
+   * @param q
+   * @returns
+   */
   async searchEMRPatient(mflCode: string, q: string) {
     const { results }: { results: any[] } = await ServiceClient.callService(
       "nishauri-facilities-registry-ms",
@@ -139,6 +150,14 @@ class PatientsRepository implements Repository<Patient> {
   async getPatientByUserId(userId: string) {
     return await PatientModel.findOne({ "person.user._id": userId });
   }
+
+  /**
+   * Updates the patient with person Id if already exist else creates
+   * @param patient
+   * @param mode override updates  the patient by overiding all other contacts and Identifiers while update
+   * adds Identifier and contacts to list if dont already exist otherwise updates the values
+   * @returns
+   */
 
   async savePatient(patient: any, mode: "update" | "override"): Promise<any> {
     let _patient;

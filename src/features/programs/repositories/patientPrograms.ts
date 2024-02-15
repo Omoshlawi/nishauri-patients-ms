@@ -35,6 +35,11 @@ const getPatientPrograms = async (patientId: any) => {
   return await PatientProgram.find({ patient: patientId, isActive: true });
 };
 
+/**
+ * Makes a call to registered facility EMR Instance using mfl code
+ * @param param0
+ * @returns
+ */
 const getEMRPatient = async ({
   firstName,
   mflCode,
@@ -48,6 +53,7 @@ const getEMRPatient = async ({
   );
   // cross check info with emr data
   const patient = results.find((pat) => {
+    // Looks for Identifier name (based on program code identifier name mapping) and Value (unique patient ptogram Id)
     const identifier = pat.identifiers.find(
       (id: any) =>
         id.identifierType.display ===
@@ -60,7 +66,7 @@ const getEMRPatient = async ({
   if (!patient)
     throw {
       status: 404,
-      errors: { detail: "No patient match found" },
+      errors: { detail: "No matching patient found" },
     };
   return patient;
 };
