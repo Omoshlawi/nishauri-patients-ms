@@ -32,7 +32,22 @@ const userRegisteredToProgram = async (userId: string, programCode: string) => {
 };
 
 const getPatientPrograms = async (patientId: any) => {
-  return await PatientProgram.find({ patient: patientId, isActive: true });
+  return await PatientProgram.aggregate([
+    {
+      $match: {
+        patient: patientId,
+        isActive: true,
+      },
+    },
+    {
+      $lookup: {
+        as: "program",
+        from: "programs",
+        foreignField: "programCode",
+        localField: "programCode",
+      },
+    },
+  ]);
 };
 
 /**

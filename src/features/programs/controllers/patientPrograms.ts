@@ -38,7 +38,7 @@ export const requestVerificationCode = async (
     // Send sms to patient
     const smsTemplate: string = config.get("sms.PROGRAM_OTP_SMS");
     const sms = parseMessage({ code }, smsTemplate);
-
+    // TODO Change the phone number to user preference
     await sendSms(sms, "0793889658");
     return res.json({
       detail: `OTP sent to ${mode} 0793889658 successfully`,
@@ -100,7 +100,7 @@ export const register = async (
     let _patient: any = {
       identifiers,
       person: { ...profile.person[0], user: profile },
-      contact: Object.entries(contacts).map(([type, contact]) => ({
+      contacts: Object.entries(contacts).map(([type, contact]) => ({
         type,
         contact,
       })),
@@ -122,7 +122,7 @@ export const register = async (
     return res.json({
       programCode: validation.data.programCode,
       message: "Choose where otp is sent",
-      contacts: _patient.contact,
+      contacts: _patient.contacts,
     });
   } catch (error) {
     next(error);
@@ -141,7 +141,7 @@ export const getRegisteredPrograms = async (
     if (!patient)
       throw { status: 404, errors: { detail: "Patient not found" } };
     return res.json({
-      reuslts: await patientProgramRepository.getPatientPrograms(patient._id),
+      results: await patientProgramRepository.getPatientPrograms(patient._id),
     });
   } catch (error) {
     next(error);
