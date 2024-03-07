@@ -10,6 +10,7 @@ import config from "config";
 import { parseMessage, sendSms } from "../../../utils/helpers";
 import { patientsRepository } from "../../patients/repositories";
 import { APIException } from "../../../shared/exceprions";
+import { z } from "zod";
 
 export const requestVerificationCode = async (
   req: Request,
@@ -23,7 +24,7 @@ export const requestVerificationCode = async (
     )
       ? (req.query.mode as any)
       : "sms";
-    if (!Types.ObjectId.isValid(req.params.id))
+    if (!z.string().uuid().safeParse(req.params.id).success)
       throw { status: 404, errors: { detail: "Patient not found" } };
     const patient = await patientsRepository.getPatientByUserId(req.params.id);
 
@@ -56,8 +57,9 @@ export const register = async (
   try {
     //----------------1.Validation
     //  a.validate param id id is valid Object id(userId) ✅
-    if (!Types.ObjectId.isValid(req.params.id))
+    if (!z.string().uuid().safeParse(req.params.id).success)
       throw { status: 404, errors: { detail: "Patient not found" } };
+
     const validation = await PatientProgramRegistrationSchema.safeParseAsync(
       req.body
     );
@@ -76,11 +78,13 @@ export const register = async (
           _errors: ["You are already registered to this program"],
         },
       });
+
     // --------------2. Get EMR Patient and save ✅
     // a.GET Patient from EMR, throws excepion if no match
     const patient = await patientProgramRepository.getEMRPatient(
       validation.data
     );
+
     // b.Extract patient identifiers ✅
     const identifiers = patientsRepository.extractIndentifiers(
       validation.data.mflCode,
@@ -134,7 +138,7 @@ export const getRegisteredPrograms = async (
   next: NextFunction
 ) => {
   try {
-    if (!Types.ObjectId.isValid(req.params.id))
+    if (!z.string().uuid().safeParse(req.params.id).success)
       throw { status: 404, errors: { detail: "Invalid patient" } };
     const patient = await patientsRepository.getPatientByUserId(req.params.id);
 
@@ -153,7 +157,7 @@ export const verifyProgramRegistration = async (
   next: NextFunction
 ) => {
   try {
-    if (!Types.ObjectId.isValid(req.params.id))
+    if (!z.string().uuid().safeParse(req.params.id).success)
       throw { status: 404, errors: { detail: "Invalid patient" } };
     const verification = await ProgramVerificationSchema.safeParseAsync(
       req.body

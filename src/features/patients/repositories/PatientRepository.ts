@@ -147,7 +147,7 @@ class PatientsRepository implements Repository<Patient> {
       return prev;
     }, {});
   }
-  async getPatientByUserId(userId: string) {
+  async  getPatientByUserId(userId: string) {
     return await PatientModel.findOne({ "person.user._id": userId });
   }
 
